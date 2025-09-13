@@ -3,8 +3,13 @@ import torch
 import numpy as np
 from collections import OrderedDict, defaultdict
 from transformers import BertTokenizer
+import os
+from transformers import BertTokenizer
+from huggingface_hub import HfApi
 
-
+# hack: 屏蔽 huggingface_hub 的网络请求
+HfApi.model_info = lambda *args, **kwargs: None
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
 sentiment2id = {'negative': 3, 'neutral': 4, 'positive': 5}
 
 label = ['N', 'B-A', 'I-A', 'A', 'B-O', 'I-O', 'O', 'negative', 'neutral', 'positive']
@@ -252,7 +257,8 @@ class Instance(object):
 
 def load_data_instances(sentence_packs, post_vocab, deprel_vocab, postag_vocab, synpost_vocab, args):
     instances = list()
-    tokenizer = BertTokenizer.from_pretrained(args.bert_model_path)
+    tokenizer = BertTokenizer.from_pretrained(args.bert_model_path, local_files_only=True)
+    # tokenizer = BertTokenizer.from_pretrained(args.bert_model_path)
     for sentence_pack in sentence_packs:
         instances.append(Instance(tokenizer, sentence_pack, post_vocab, deprel_vocab, postag_vocab, synpost_vocab, args))
     return instances

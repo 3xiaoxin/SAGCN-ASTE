@@ -10,7 +10,7 @@ tqdm = "*"
 numpy = "*"
 scikit-learn = "*"
 torch = ">=1.4.0"
-transformers = "==3.4.0"
+transformers = "==4.18.0"
 
 [requires]
-python_version = "3.6"
+python_version = "3.9"

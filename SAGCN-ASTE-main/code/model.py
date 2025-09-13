@@ -3,7 +3,7 @@ import torch.nn
 import torch.nn as nn
 import torch.nn.functional as F
 from transformers import BertModel, BertTokenizer
-
+from modeling_bert_adapter import BertAdapterModel
 
 class LayerNorm(nn.Module):
     "Construct a layernorm module (See citation for details)."
@@ -105,10 +105,12 @@ class Biaffine(nn.Module):
         batch_size, len2, dim2 = input2.size()
         if self.bias[0]:
             ones = torch.ones(batch_size, len1, 1).to(self.args.device)
+            # ones = torch.ones(batch_size, len1, 1)
             input1 = torch.cat((input1, ones), dim=2)
             dim1 += 1
         if self.bias[1]:
             ones = torch.ones(batch_size, len2, 1).to(self.args.device)
+            # ones = torch.ones(batch_size, len2, 1)
             input2 = torch.cat((input2, ones), dim=2)
             dim2 += 1
         affine = self.linear(input1)
@@ -119,12 +121,11 @@ class Biaffine(nn.Module):
         biaffine = biaffine.contiguous().view(batch_size, len2, len1, self.out_features)
         return biaffine
 
-
-class EMCGCN(torch.nn.Module):
+class SACGCN(torch.nn.Module):
     def __init__(self, args):
-        super(EMCGCN, self).__init__()
+        super(SACGCN, self).__init__()
         self.args = args
-        self.bert = BertModel.from_pretrained(args.bert_model_path)
+        self.bert = BertAdapterModel.from_pretrained(args.bert_model_path)
         self.tokenizer = BertTokenizer.from_pretrained(args.bert_model_path)
         self.dropout_output = torch.nn.Dropout(args.emb_dropout)
 

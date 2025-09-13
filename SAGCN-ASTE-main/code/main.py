@@ -9,14 +9,15 @@ import torch.nn.functional as F
 from tqdm import trange
 
 from data import load_data_instances, DataIterator, label2id
-from model import EMCGCN
+from model import SACGCN
 import utils
 
 import numpy as np
 
 from prepare_vocab import VocabHelp
 from transformers import AdamW
-
+import os
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
 def get_bert_optimizer(model, args):
     # # Prepare optimizer and schedule (linear warmup and decay)
@@ -78,7 +79,7 @@ def train(args):
 
     if not os.path.exists(args.model_dir):
         os.makedirs(args.model_dir)
-    model = EMCGCN(args).to(args.device)
+    model = SACGCN(args).to(args.device)
     optimizer = get_bert_optimizer(model, args)
 
     # label = ['N', 'B-A', 'I-A', 'A', 'B-O', 'I-O', 'O', 'negative', 'neutral', 'positive']
@@ -211,7 +212,8 @@ if __name__ == '__main__':
                         help='gpu or cpu')
 
     parser.add_argument('--bert_model_path', type=str,
-                        default="bert-base-uncased",
+                        # default="/root/bert-base-uncased",
+                        default=r"D:\artificial\bert-base-uncased",
                         help='pretrained bert model path')
     
     parser.add_argument('--bert_feature_dim', type=int, default=768,
